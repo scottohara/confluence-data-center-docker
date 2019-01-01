@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+  # Confluence node 1
+  confluence1:
+    image: atlassian/confluence-server:latest
+    container_name: confluencedc_confuence1                           # Name for node 1
+    volumes:
+      - confluence1Home:/var/atlassian/application-data/confluence    # Local home for node 1
+      - sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
+    ports:
+      - "8010:8090"                                                   # Confluence web port for node 1
+      - "8011:8091"                                                   # Synchrony port for node 1
+    environment:
+      - CATALINA_CONNECTOR_PROXYNAME=localhost                        # Reverse proxy host name
+      - CATALINA_CONNECTOR_PROXYPORT=8090                             # Reverse proxy port
+    labels:
+      - "traefik.backend=confluence"                                  # Name of the backend
+      - "traefik.frontend.entryPoints=http"                           # Match requests coming in on http
+      - "traefik.frontend.rule=Host:localhost"                        # Match requests coming in on localhost
+      - "traefik.backend.loadbalancer.stickiness=true"                # Stick users to a single node
+      - "traefik.port=8090"                                           # Entry point port
+
+  # Confluence node 2
+  confluence2:
+    image: atlassian/confluence-server:latest
+    container_name: confluencedc_confuence2                           # Name for node 2
+    volumes:
+      - confluence2Home:/var/atlassian/application-data/confluence    # Local home for node 2
+      - sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
+    ports:
+      - "8020:8090"                                                   # Confluence web port for node 2
+      - "8021:8091"                                                   # Synchrony port for node 2
+    environment:
+      - CATALINA_CONNECTOR_PROXYNAME=localhost                        # Reverse proxy host name
+      - CATALINA_CONNECTOR_PROXYPORT=8090                             # Reverse proxy port
+    labels:
+      - "traefik.backend=confluence"                                  # Name of the backend
+      - "traefik.frontend.entryPoints=http"                           # Match requests coming in on http
+      - "traefik.frontend.rule=Host:localhost"                        # Match requests coming in on localhost
+      - "traefik.backend.loadbalancer.stickiness=true"                # Stick users to a single node
+      - "traefik.port=8090"                                           # Entry point port
+
+  # Confluence node 3
+  confluence3:
+    image: atlassian/confluence-server:latest
+    container_name: confluencedc_confuence3                           # Name for node 3
+    volumes:
+      - confluence3Home:/var/atlassian/application-data/confluence    # Local home for node 3
+      - sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
+    ports:
+      - "8030:8090"                                                   # Confluence web port for node 3
+      - "8031:8091"                                                   # Synchrony port for node 3
+    environment:
+      - CATALINA_CONNECTOR_PROXYNAME=localhost                        # Reverse proxy host name
+      - CATALINA_CONNECTOR_PROXYPORT=8090                             # Reverse proxy port
+    labels:
+      - "traefik.backend=confluence"                                  # Name of the backend
+      - "traefik.frontend.entryPoints=http"                           # Match requests coming in on http
+      - "traefik.frontend.rule=Host:localhost"                        # Match requests coming in on localhost
+      - "traefik.backend.loadbalancer.stickiness=true"                # Stick users to a single node
+      - "traefik.port=8090"                                           # Entry point port
+
+  # Load balancer / reverse-proxy (traefik)
+  proxy:
+    image: traefik
+    command: --api --docker                                           # Enable the admin and docker provider
+    container_name: confluencedc_proxy                                # Name for the reverse proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro                  # Map the host docker daemon socket into the container (readonly)
+    ports:
+      - 8090:80                                                       # Cluster entry point (http://localhost:8090)
+      - 8091:8080                                                     # traefik web admin interface (http://localhost:8091)
+
+volumes:
+  confluence1Home:                                                    # Local home for node 1  
+  confluence2Home:                                                    # Local home for node 2
+  confluence3Home:                                                    # Local home for node 3  
+  confluence4Home:                                                    # Local home for node 4
+  sharedHome:                                                         # Shared home for cluster
