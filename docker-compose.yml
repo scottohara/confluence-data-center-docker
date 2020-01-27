@@ -6,8 +6,8 @@ services:
     image: atlassian/confluence-server:latest
     container_name: confluencedc_confuence1                           # Name for node 1
     volumes:
-      - confluence1Home:/var/atlassian/application-data/confluence    # Local home for node 1
-      - sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
+      - ./confluence1Home:/var/atlassian/application-data/confluence    # Local home for node 1
+      - ./sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
     ports:
       - "8010:8090"                                                   # Confluence web port for node 1
       - "8011:8091"                                                   # Synchrony port for node 1
@@ -26,8 +26,8 @@ services:
     image: atlassian/confluence-server:latest
     container_name: confluencedc_confuence2                           # Name for node 2
     volumes:
-      - confluence2Home:/var/atlassian/application-data/confluence    # Local home for node 2
-      - sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
+      - ./confluence2Home:/var/atlassian/application-data/confluence    # Local home for node 2
+      - ./sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
     ports:
       - "8020:8090"                                                   # Confluence web port for node 2
       - "8021:8091"                                                   # Synchrony port for node 2
@@ -46,8 +46,8 @@ services:
     image: atlassian/confluence-server:latest
     container_name: confluencedc_confuence3                           # Name for node 3
     volumes:
-      - confluence3Home:/var/atlassian/application-data/confluence    # Local home for node 3
-      - sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
+      - ./confluence3Home:/var/atlassian/application-data/confluence    # Local home for node 3
+      - ./sharedHome:/var/atlassian/application-data/shared             # Shared home for cluster
     ports:
       - "8030:8090"                                                   # Confluence web port for node 3
       - "8031:8091"                                                   # Synchrony port for node 3
@@ -63,7 +63,7 @@ services:
 
   # Load balancer / reverse-proxy (traefik)
   proxy:
-    image: traefik
+    image: traefik:1.7.9-alpine
     command: --api --docker                                           # Enable the admin and docker provider
     container_name: confluencedc_proxy                                # Name for the reverse proxy
     volumes:
@@ -76,5 +76,4 @@ volumes:
   confluence1Home:                                                    # Local home for node 1  
   confluence2Home:                                                    # Local home for node 2
   confluence3Home:                                                    # Local home for node 3  
-  confluence4Home:                                                    # Local home for node 4
   sharedHome:                                                         # Shared home for cluster
